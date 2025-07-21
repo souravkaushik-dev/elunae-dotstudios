@@ -1,0 +1,77 @@
+name: elunae
+
+publish_to: 'none'
+version: 9.6.0+134 # run update.sh after changing the version
+
+environment:
+  sdk: '>=3.7.0 <4.0.0'
+  flutter: ^3.32.6
+
+dependencies:
+  app_links: ^6.4.0
+  audio_service: ^0.18.18
+  flutter_hicons: ^1.0.0
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.5.3
+  audio_session: ^0.2.2
+  cached_network_image: ^3.4.1
+  dynamic_color: ^1.7.0
+  glassmorphism: ^3.0.0
+  flutter_easy_faq: ^1.0.1
+  liquid_glass: ^0.0.2
+  file_picker: ^10.2.0
+  fluentui_system_icons: ^1.1.273
+  flutter:
+    sdk: flutter
+  flutter_flip_card: ^0.0.6
+
+  hugeicons: ^0.0.11
+  flutter_localizations:
+    sdk: flutter
+  go_router: ^16.0.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  html: ^0.15.6
+  http: ^1.4.0
+  intl: ^0.20.2
+  just_audio: 0.10.4
+  path_provider: ^2.1.5
+  rxdart: ^0.28.0
+  url_launcher: ^6.3.1
+  youtube_explode_dart: ^2.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  translations_cleaner: ^0.0.5
+
+  # flutter_lints: ^2.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/licenses/
+
+  fonts:
+    - family: paytoneOne
+      fonts:
+        - asset: fonts/paytone/PaytoneOne-Regular.ttf
+
+    - family: thin
+      fonts:
+          - asset: fonts/thin.otf
+
+    - family: regular
+      fonts:
+        - asset: fonts/regular.otf
+
+    - family: displaymedium
+      fonts:
+        - asset: fonts/displaymedium.otf
+
+    - family: displayregular
+      fonts:
+        - asset: fonts/displayregular.otf
