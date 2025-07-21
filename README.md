@@ -44,9 +44,9 @@ Your songs, organized the way you like — cleanly grouped by:
 
 ## 📸 App Screenshots
 
-| Splash                       | Home                             | Search                             | Playlist                             | Settings                             |
-|------------------------------|----------------------------------|------------------------------------|--------------------------------------|--------------------------------------|
-| ![Splash](screenshots/0.png) | ![Home](screenshots/1_light.png) | ![Search](screenshots/2_light.png) | ![Playlist](screenshots/3_light.png) | ![Settings](screenshots/4_light.png) |
+| Splash                              | Home                              | Search                              | Playlist                              | Settings                              |
+|-------------------------------------|-----------------------------------|-------------------------------------|---------------------------------------|---------------------------------------|
+| ![Splash](screenshots/0_mockup.png) | ![Home](screenshots/1_mockup.png) | ![Search](screenshots/2_mockup.png) | ![Playlist](screenshots/3_mockup.png) | ![Settings](screenshots/4_mockup.png) |
 
 ---
 
