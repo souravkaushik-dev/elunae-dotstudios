@@ -1,5 +1,6 @@
 /*🔧 Under Design · DotStudios*/
 
+import 'package:elunae/API/version_api.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hicons/flutter_hicons.dart';
@@ -65,10 +66,13 @@ class SettingsPage extends StatelessWidget {
                             'settings',
                             style: TextStyle(
                               fontFamily: 'displaymedium',
-                              fontSize: isCollapsed ? 24.0 : 42.0, // Adjust font size for collapsed state
+                              fontSize: isCollapsed ? 24.0 : 42.0,
                               color: Theme.of(context).colorScheme.onPrimaryContainer,
                             ),
                           ),
+                          const SizedBox(height: 4),
+                          const VersionSpinner(), // <- NEW
+                          const SizedBox(height: 4),
                           Text(
                             'Discover, and Explore Your Sound.',
                             style: TextStyle(
@@ -80,7 +84,7 @@ class SettingsPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ),
+                    ),
                   background: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.vertical(

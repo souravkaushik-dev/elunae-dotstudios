@@ -15,6 +15,7 @@ dependencies:
   shared_preferences: ^2.5.3
   audio_session: ^0.2.2
   cached_network_image: ^3.4.1
+  package_info_plus: ^8.3.0
   dynamic_color: ^1.7.0
   glassmorphism: ^3.0.0
   flutter_easy_faq: ^1.0.1
