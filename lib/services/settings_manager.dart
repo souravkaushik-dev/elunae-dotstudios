@@ -55,7 +55,7 @@ final themeModeSetting =
     Hive.box('settings').get('themeMode', defaultValue: 'system') as String;
 
 Color primaryColorSetting = Color(
-  Hive.box('settings').get('accentColor', defaultValue: 0xff91cef4),
+  Hive.box('settings').get('accentColor', defaultValue: 0x1AFFFFFF),
 );
 
 // Non-Storage Notifiers

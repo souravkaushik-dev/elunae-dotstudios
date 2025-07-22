@@ -1,5 +1,6 @@
 /*🔧 Under Design · DotStudios*/
 
+import 'package:elunae/API/liquid_glass.dart';
 import 'package:elunae/API/version_api.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -166,7 +167,7 @@ class SettingsPage extends StatelessWidget {
         CustomBar(
           context.l10n!.dynamicColor,
           HugeIcons.strokeRoundedToggleOn,
-          trailing: Switch(
+          trailing: LiquidGlassSwitch(
             value: useSystemColor.value,
             onChanged: (value) => _toggleSystemColor(context, value),
           ),
@@ -175,9 +176,9 @@ class SettingsPage extends StatelessWidget {
           CustomBar(
             context.l10n!.pureBlackTheme,
             Hicons.colorPickerLightOutline,
-            trailing: Switch(
-              value: usePureBlackColor.value,
-              onChanged: (value) => _togglePureBlack(context, value),
+            trailing: LiquidGlassSwitch(
+              value: useSystemColor.value,
+              onChanged: (value) => _toggleSystemColor(context, value),
             ),
           ),
         ValueListenableBuilder<bool>(
@@ -186,7 +187,7 @@ class SettingsPage extends StatelessWidget {
             return CustomBar(
               context.l10n!.predictiveBack,
               HugeIcons.strokeRoundedMoonSlowWind,
-              trailing: Switch(
+              trailing:  LiquidGlassSwitch(
                 value: value,
                 onChanged: (value) => _togglePredictiveBack(context, value),
               ),
@@ -199,7 +200,7 @@ class SettingsPage extends StatelessWidget {
             return CustomBar(
               context.l10n!.offlineMode,
               HugeIcons.strokeRoundedWifiDisconnected02,
-              trailing: Switch(
+              trailing:  LiquidGlassSwitch(
                 value: value,
                 onChanged: (value) => _toggleOfflineMode(context, value),
               ),
@@ -213,7 +214,7 @@ class SettingsPage extends StatelessWidget {
               context.l10n!.backgroundPlay,
 
               HugeIcons.strokeRoundedChangeScreenMode,
-              trailing: Switch(
+              trailing:  LiquidGlassSwitch(
                 value: value,
                 onChanged: (value) => _toggleBackgroundPlay(context, value),
               ),
@@ -238,7 +239,7 @@ class SettingsPage extends StatelessWidget {
             return CustomBar(
               context.l10n!.automaticSongPicker,
               HugeIcons.strokeRoundedMusicNote01,
-              trailing: Switch(
+              trailing:  LiquidGlassSwitch(
                 value: value,
                 onChanged: (value) {
                   audioHandler.changeAutoPlayNextStatus();
@@ -255,7 +256,7 @@ class SettingsPage extends StatelessWidget {
               context.l10n!.originalRecommendations,
               HugeIcons.strokeRoundedBinaryCode,
               borderRadius: commonCustomBarRadiusLast,
-              trailing: Switch(
+              trailing:  LiquidGlassSwitch(
                 value: value,
                 onChanged:
                     (value) => _toggleDefaultRecommendations(context, value),

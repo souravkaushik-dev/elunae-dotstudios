@@ -76,65 +76,51 @@ class _HomePageState extends State<HomePage> {
           final roundedCorner = isCollapsed ? 20.0 : 30.0;
 
           return FlexibleSpaceBar(
-            centerTitle: true,
-            titlePadding: EdgeInsets.only(top: isCollapsed ? 0.0 : 80.0, left: 16.0),
-            title: Align(
-              alignment: isCollapsed ? Alignment.centerLeft : Alignment.center,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Column(
-                  crossAxisAlignment: isCollapsed
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Welcome to the resonance',
-                          style: TextStyle(
-                            fontFamily: 'thin',
-                            fontSize: isCollapsed ? 12.0 : 16.0,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            final newName = await showDialog<String>(
-                              context: context,
-                              builder: (context) => EditNameDialog(currentName: _userName ?? 'Guest'),
-                            );
+            titlePadding: EdgeInsets.only(left: 10.0, bottom: 30.0), // consistent iOS-style padding
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+                    alignment: Alignment.centerLeft,
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  ),
+                  onPressed: () async {
+                    final newName = await showDialog<String>(
+                      context: context,
+                      builder: (context) => EditNameDialog(currentName: _userName ?? 'Guest'),
+                    );
 
-                            if (newName != null && newName.trim().isNotEmpty) {
-                              final prefs = await SharedPreferences.getInstance();
-                              await prefs.setString('userName', newName.trim());
-
-                              // Immediately update local state if you're on the homepage
-                              setState(() {
-                                _userName = newName.trim();
-                              });
-
-                              HapticFeedback.lightImpact();
-
-                              // Optional: Only navigate if you're in splash screen
-                              // Navigator.pushReplacementNamed(context, '/home');
-                            }
-                          },
-                          child: Text(
-                            _userName == 'Guest' || _userName == null ? 'Elunian' : _userName!,
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontFamily: 'displaymedium',
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                      ],
+                    if (newName != null && newName.trim().isNotEmpty) {
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('userName', newName.trim());
+                      setState(() {
+                        _userName = newName.trim();
+                      });
+                      HapticFeedback.lightImpact();
+                    }
+                  },
+                  child: Text(
+                    _userName == 'Guest' || _userName == null ? 'Elunian' : _userName!,
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontFamily: 'displaymedium',
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 2),
+                Text(
+                  'Welcome to the resonance',
+                  style: TextStyle(
+                    fontFamily: 'thin',
+                    fontSize: 14.0,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                ),
+              ],
             ),
             background: Stack(
               children: [

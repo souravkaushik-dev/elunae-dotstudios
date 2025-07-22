@@ -23,4 +23,5 @@ const availableColors = <Color>[
   Color(0xFFE2C09F), // Pale Peach
   Color(0xff91cef4), // Material Skycolor
   Color(0xFFAABBCC), // Light Steel Blue
+  Color(0x1AFFFFFF), // Glass White (~10% opacity white)
 ];
