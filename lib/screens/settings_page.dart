@@ -178,7 +178,7 @@ class SettingsPage extends StatelessWidget {
             Hicons.colorPickerLightOutline,
             trailing: LiquidGlassSwitch(
               value: useSystemColor.value,
-              onChanged: (value) => _toggleSystemColor(context, value),
+              onChanged: (value) => _togglePureBlack(context, value),
             ),
           ),
         ValueListenableBuilder<bool>(

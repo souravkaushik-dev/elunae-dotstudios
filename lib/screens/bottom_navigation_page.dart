@@ -26,7 +26,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
@@ -41,8 +41,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     return ValueListenableBuilder<bool>(
       valueListenable: offlineMode,
       builder: (context, isOfflineMode, _) {
-        if (_previousOfflineMode != null &&
-            _previousOfflineMode != isOfflineMode) {
+        if (_previousOfflineMode != null && _previousOfflineMode != isOfflineMode) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _handleOfflineModeChange(isOfflineMode);
           });
@@ -59,11 +58,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
             backgroundColor: Colors.transparent,
             body: Stack(
               children: [
-                Column(
-                  children: [
-                    Expanded(child: widget.child),
-                  ],
-                ),
+                Column(children: [Expanded(child: widget.child)]),
 
                 // Mini player
                 StreamBuilder<MediaItem?>(
@@ -72,7 +67,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
                     final metadata = snapshot.data;
                     if (metadata == null) return const SizedBox.shrink();
                     return Positioned(
-                      bottom: 115,
+                      bottom: 130,
                       left: 16,
                       right: 16,
                       child: MiniPlayer(metadata: metadata),
@@ -80,47 +75,44 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
                   },
                 ),
 
-                // Custom nav bar
+                // iOS 26-style nav bar
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12,
-                      right: 12,
-                      bottom: 50, // Increased to float above nav bar
-                    ),
+                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        double totalWidth = constraints.maxWidth;
-                        double spaceWidth = totalWidth * 0.20;
-                        double navBarWidth = totalWidth * 0.70;
+                        final itemsList = _getNavigationItems(offlineMode.value);
+                        final homeItem = itemsList[0];
+                        final groupedItems = itemsList.sublist(1); // search, library, settings
 
-                        return SizedBox(
-                          height: 64,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _buildSideNavItem(items[0], 0),
-                              LiquidGlass(
-                                opacity: 0.06,
-                                borderRadius: BorderRadius.circular(30),
-                                child: SizedBox(
-                                  height: 64,
-                                  width: navBarWidth,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(
-                                      items.length - 1,
-                                          (i) =>
-                                          _buildCenterNavItem(items[i + 1], i + 1),
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            _buildFloatingSideButton(homeItem, 0),
+                            const SizedBox(width: 12),
+
+                            // Grouped glass pill nav
+                            LiquidGlass(
+                              opacity: 0.08,
+                              blur: 30,
+                              borderRadius: BorderRadius.circular(40),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(
+                                    groupedItems.length,
+                                        (i) => Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      child: _buildCenterNavItem(groupedItems[i], i + 1),
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         );
                       },
                     ),
@@ -134,28 +126,50 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     );
   }
 
-  Widget _buildSideNavItem(_NavigationItem item, int index) {
+  Widget _buildFloatingSideButton(_NavigationItem item, int index) {
     final selected = widget.child.currentIndex == item.shellIndex;
     final tapped = _tappedIcons.contains(index);
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     return GestureDetector(
       onTap: () => _onTabTapped(index, _getNavigationItems(offlineMode.value)),
       child: AnimatedScale(
-        scale: tapped ? 1.3 : 1.0,
+        scale: tapped ? 1.25 : 1.0,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutBack,
-        child: LiquidGlass(
-          opacity: 0.06,
-          borderRadius: BorderRadius.circular(30),
-          child: SizedBox(
-            height: 64,
-            width: MediaQuery.of(context).size.width * 0.20,
-            child: Icon(
-              selected ? item.selectedIcon : item.icon,
-              size: 22,
-              color: selected
-                  ? Theme.of(context).colorScheme.primary
-                  : _getUnselectedIconColor(context),
+        child: Container(
+          height: 64, // Match center nav bar
+          constraints: const BoxConstraints(minWidth: 70), // Wider for balance
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: LiquidGlass(
+            blur: 30,
+            opacity: 0.10,
+            borderRadius: BorderRadius.circular(28),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      selected ? item.selectedIcon : item.icon,
+                      size: 20,
+                      color: selected ? primaryColor : _getUnselectedIconColor(context),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: selected ? primaryColor : _getUnselectedIconColor(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -163,26 +177,65 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     );
   }
 
+
+
   Widget _buildCenterNavItem(_NavigationItem item, int index) {
     final selected = widget.child.currentIndex == item.shellIndex;
     final tapped = _tappedIcons.contains(index);
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     return GestureDetector(
       onTap: () => _onTabTapped(index, _getNavigationItems(offlineMode.value)),
-      child: AnimatedScale(
-        scale: tapped ? 1.3 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutBack,
-        child: Icon(
-          selected ? item.selectedIcon : item.icon,
-          size: 22,
-          color: selected
-              ? Theme.of(context).colorScheme.primary
-              : _getUnselectedIconColor(context),
+      child: selected
+          ? LiquidGlass(
+        opacity: 0.15,
+        blur: 30,
+        borderRadius: BorderRadius.circular(28),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          child: _buildAnimatedIconLabel(item, selected, tapped, primaryColor),
         ),
+      )
+          : Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        child: _buildAnimatedIconLabel(item, selected, tapped, primaryColor),
       ),
     );
   }
+
+  Widget _buildAnimatedIconLabel(
+      _NavigationItem item, bool selected, bool tapped, Color primaryColor) {
+    final iconColor = selected ? primaryColor : _getUnselectedIconColor(context);
+    final labelColor = selected ? primaryColor : _getUnselectedIconColor(context);
+
+    return AnimatedScale(
+      scale: tapped ? 1.25 : 1.0,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutBack,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            selected ? item.selectedIcon : item.icon,
+            size: 20,
+            color: iconColor,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            item.label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: labelColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
 
   List<_NavigationItem> _getNavigationItems(bool isOfflineMode) {
     final items = <_NavigationItem>[
@@ -252,14 +305,14 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   }
 
   Color _getUnselectedIconColor(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    return brightness == Brightness.dark ? Colors.white60 : Colors.black45;
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white70
+        : Colors.black54;
   }
 
   static bool _mediaItemEquals(MediaItem? prev, MediaItem? curr) {
     if (prev == curr) return true;
     if (prev == null || curr == null) return false;
-
     return prev.id == curr.id &&
         prev.title == curr.title &&
         prev.artist == curr.artist &&
@@ -283,10 +336,17 @@ class _NavigationItem {
   final int index;
 
   int get shellIndex {
-    if (route == '/home') return 0;
-    if (route == '/search') return 1;
-    if (route == '/library') return 2;
-    if (route == '/settings') return 3;
-    return 0;
+    switch (route) {
+      case '/home':
+        return 0;
+      case '/search':
+        return 1;
+      case '/library':
+        return 2;
+      case '/settings':
+        return 3;
+      default:
+        return 0;
+    }
   }
 }

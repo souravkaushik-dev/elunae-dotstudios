@@ -292,7 +292,7 @@ class _SearchPageState extends State<SearchPage> {
             Positioned(
               left: 16,
               right: 16,
-              bottom: 200,
+              bottom: 220,
               child: CustomSearchBar(
                 loadingProgressNotifier: _fetchingSongs,
                 controller: _searchBar,
