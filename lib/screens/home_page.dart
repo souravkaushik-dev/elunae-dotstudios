@@ -28,20 +28,136 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+
+  final List<String> _avatars = [
+    'assets/avatars/boy.jpg',
+    'assets/avatars/girl.webp',
+    'assets/avatars/boy3.gif',
+    'assets/avatars/girl2.avif',
+    'assets/avatars/girl1.png',
+    'assets/avatars/boy2.jpg',
+    'assets/avatars/dance.gif',
+    'assets/avatars/dance2.gif',
+  ];
+
   String? _userName;
+  int? _avatarIndex;
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
+    _loadUserNameAndAvatar();
   }
 
-  void _loadUserName() async {
+  Future<void> _loadUserNameAndAvatar() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userName = prefs.getString('userName') ?? 'Guest';
+      _userName = prefs.getString('userName');
+      _avatarIndex = prefs.getInt('userAvatar') ?? 0;
     });
   }
+
+  Future<void> _showAvatarPicker(TapDownDetails details) async {
+    final overlay = Overlay.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final accentColor = colorScheme.primary.withOpacity(0.15); // Accent tinted blur
+    final renderBox = context.findRenderObject() as RenderBox;
+    final tapPosition = renderBox.globalToLocal(details.globalPosition);
+
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          left: details.globalPosition.dx - 260,
+          top: details.globalPosition.dy + 10,
+          child: Material(
+            color: Colors.transparent,
+            child: AnimatedScale(
+              scale: 1,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              child: AnimatedOpacity(
+                opacity: 1,
+                duration: const Duration(milliseconds: 300),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                    child: Container(
+                      width: 300,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.25),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.black.withOpacity(0.3)
+                                : Colors.grey.withOpacity(0.15),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(top: 8),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1,
+                        ),
+                        itemCount: _avatars.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              final prefs = await SharedPreferences.getInstance();
+                              await prefs.setInt('userAvatar', index);
+                              setState(() {
+                                _avatarIndex = index;
+                              });
+                              HapticFeedback.selectionClick();
+                              entry.remove();
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                _avatars[index],
+                                width: 55,
+                                height: 55,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    overlay.insert(entry);
+
+    // Optional auto dismiss after a while
+    await Future.delayed(const Duration(seconds: 6));
+    if (entry.mounted) entry.remove();
+  }
+
 
 
   @override
@@ -76,48 +192,82 @@ class _HomePageState extends State<HomePage> {
           final roundedCorner = isCollapsed ? 20.0 : 30.0;
 
           return FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 10.0, bottom: 30.0), // consistent iOS-style padding
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+            titlePadding: const EdgeInsets.only(left: 10.0, bottom: 30.0, right: 10.0),
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TextButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
-                    alignment: Alignment.centerLeft,
-                    overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  ),
-                  onPressed: () async {
-                    final newName = await showDialog<String>(
-                      context: context,
-                      builder: (context) => EditNameDialog(currentName: _userName ?? 'Guest'),
-                    );
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+                          alignment: Alignment.centerLeft,
+                          overlayColor: MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () async {
+                          final newName = await showDialog<String>(
+                            context: context,
+                            builder: (context) => EditNameDialog(currentName: _userName ?? 'Guest'),
+                          );
 
-                    if (newName != null && newName.trim().isNotEmpty) {
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('userName', newName.trim());
-                      setState(() {
-                        _userName = newName.trim();
-                      });
-                      HapticFeedback.lightImpact();
-                    }
-                  },
-                  child: Text(
-                    _userName == 'Guest' || _userName == null ? 'Elunian' : _userName!,
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontFamily: 'displaymedium',
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
+                          if (newName != null && newName.trim().isNotEmpty) {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('userName', newName.trim());
+                            setState(() {
+                              _userName = newName.trim();
+                            });
+                            HapticFeedback.lightImpact();
+                          }
+                        },
+                        child: Text(
+                          _userName == 'Guest' || _userName == null ? 'Elunian' : _userName!,
+                          style: TextStyle(
+                            fontSize: 34,
+                            fontFamily: 'displaymedium',
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Welcome to the resonance',
+                        style: TextStyle(
+                          fontFamily: 'thin',
+                          fontSize: 14.0,
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'Welcome to the resonance',
-                  style: TextStyle(
-                    fontFamily: 'thin',
-                    fontSize: 14.0,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                const SizedBox(width: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: GestureDetector(
+                    onTapDown: _showAvatarPicker,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: _avatarIndex != null
+                          ? Image.asset(
+                        _avatars[_avatarIndex!],
+                        width: 38,
+                        height: 38,
+                        fit: BoxFit.cover,
+                      )
+                          : Container(
+                        width: 38,
+                        height: 38,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        child: Icon(
+                          Icons.person,
+                          size: 22,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -146,6 +296,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
     );
+  }
   }
   Widget _buildSuggestedPlaylists() {
     return FutureBuilder<List<dynamic>>(
@@ -368,4 +519,3 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}

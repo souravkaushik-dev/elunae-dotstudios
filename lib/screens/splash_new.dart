@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:liquid_glass/liquid_glass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:elunae/screens/home_page.dart'; // Preview-only
+import 'package:elunae/screens/home_page.dart'; // Only for preview background
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,11 +23,9 @@ class _SplashScreenState extends State<SplashScreen>
   bool _showTextField = false;
 
   @override
-  @override
   void initState() {
     super.initState();
 
-    // ✅ Initialize animation controller safely here
     _fadeController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -50,9 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
       return;
     }
 
-    // ✅ Now safely start the animation
     _fadeController.forward();
-
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) setState(() => _showTextField = true);
   }
@@ -65,7 +61,75 @@ class _SplashScreenState extends State<SplashScreen>
     await prefs.setString('userName', name);
 
     HapticFeedback.lightImpact();
-    if (mounted) GoRouter.of(context).go('/home');
+
+    final selectedAvatar = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _buildAvatarPicker(),
+    );
+
+    if (selectedAvatar != null) {
+      await prefs.setInt('userAvatar', selectedAvatar);
+      if (mounted) GoRouter.of(context).go('/home');
+    }
+  }
+
+  Widget _buildAvatarPicker() {
+    final avatars = [
+      'assets/avatars/boy.jpg',
+      'assets/avatars/girl.webp',
+      'assets/avatars/boy3.gif',
+      'assets/avatars/girl2.avif',
+      'assets/avatars/girl1.png',
+      'assets/avatars/boy2.jpg',
+      'assets/avatars/dance.gif',
+      'assets/avatars/dance2.gif',
+    ];
+
+// Inside your widget builder method:
+
+    return LiquidGlass(
+      opacity: 0.25, // Adjust for desired glass opacity
+      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          // Remove background color to let glass effect show through
+          // color: Colors.black.withOpacity(0.85), // Remove this or keep transparent
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Choose Your Avatar',
+              style: GoogleFonts.poppins(color: Colors.white, fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            Wrap(
+              spacing: 20,
+              runSpacing: 20,
+              children: List.generate(avatars.length, (index) {
+                return GestureDetector(
+                  onTap: () => Navigator.pop(context, index),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      avatars[index],
+                      width: 70,
+                      height: 70,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -81,14 +145,15 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          /// ✅ Blurred preview of home screen
+          /// Background Preview
           Positioned.fill(
             child: IgnorePointer(
               ignoring: true,
-              child: const HomePage(), // Only for splash background preview
+              child: const HomePage(), // preview only
             ),
           ),
 
+          /// Blur Effect
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
@@ -96,7 +161,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
 
-          /// ✅ Welcome text
+          /// Welcome Text
           Center(
             child: FadeTransition(
               opacity: _fadeAnimation,
@@ -111,7 +176,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
 
-          /// ✅ Skip button
+          /// Skip Button
           Positioned(
             top: 40,
             left: 20,
@@ -130,7 +195,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
 
-          /// ✅ Name input
+          /// Name Input
           if (_showTextField)
             Positioned(
               left: 20,
@@ -148,7 +213,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: GoogleFonts.roboto(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
-                        filled: false, // ❌ Prevent extra background
+                        filled: false,
                         hintText: 'Enter your name',
                         hintStyle: GoogleFonts.roboto(
                           color: Colors.white70,
